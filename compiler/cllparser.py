@@ -7,11 +7,7 @@ def parse_block(block):
     inner_block = []
     blocks_opened = 1
     block_concat = 'append'
-    print "i parse the block"
-    print block
-    print
-    print
-    #print  block
+
     
     i = 0
     while i < len(block):
@@ -19,34 +15,23 @@ def parse_block(block):
         if block[i][0] in ['if', 'else', 'elseif', 'while']:
             block_concat = 'append'
             blocks_opened += 1
-            print "i found a block"
-            
             nxt_block  = parse_block(block[i+1:])
-            print(nxt_block)
             statements = nxt_block[0]
             statements_counter = nxt_block[1]
+            
             if len(statements) > 1 : statements = ['seq'] + statements
             if len(statements) == 1 : statements = statements[0]
             block[i].append(statements) 
             inner_block.append(block[i])
+            
             if block[i][0] == 'elseif':
-                print "PEEP PEEP"
-                print block[i]
-                print inner_block
                 u = inner_block[:-1]
                 u.append(['if'] + block[i][1:])
-                print u
-                print ast
                 inner_block = u
                 block_concat = 'add'
             if block[i][0] == 'else':
-                print "PEEP PEEP"
-                print block[i]
-                print inner_block
                 u = inner_block[:-1]
                 u.append(block[i][1:])
-                print u
-                print ast
                 inner_block = u
                 block_concat = 'add'
             i += statements_counter
@@ -57,14 +42,9 @@ def parse_block(block):
                 return inner_block, i+1, block_concat
                 
         else:
-            print "INNERBLOCK WITHIN ELSE CLAUSE:"
             inner_block.append(block[i])
-            print inner_block
-            print i
             i += 1
             
-        
-    print
 
 def parse_lines(lns):
     global ast
@@ -76,29 +56,21 @@ def parse_lines(lns):
         lines.append(parse_line(lns[i]))
         
         i += 1
-        
-    print   
-    print lines
-    print 
     
     i = 0
     while i < len(lines): 
         print lines[i]
         if lines[i][0] in ['if', 'else', 'elseif', 'while']:
-            print "i found a block"
             inner_block = parse_block(lines[i+1:])
             statements = inner_block[0]
             statements_counter = inner_block[1]
+            
             if len(statements) > 1 : statements = ['seq'] + statements
             if len(statements) == 1 : statements = statements[0]
-            print  "INNER BLOCK"
-            print inner_block[0]
+
             if inner_block[2] == 'append' : lines[i].append(statements)  
             if inner_block[2] == 'add' : lines[i] = lines[i] + (statements[1:])  
-            print lines[i]
-            print "INNER BLOCK I"
-            print i
-            print
+
             ast.append(lines[i])
             i += statements_counter
             
