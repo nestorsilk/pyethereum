@@ -59,7 +59,6 @@ def parse_lines(lns):
     
     i = 0
     while i < len(lines): 
-        print lines[i]
         if lines[i][0] in ['if', 'else', 'elseif', 'while']:
             inner_block = parse_block(lines[i+1:])
             statements = inner_block[0]
