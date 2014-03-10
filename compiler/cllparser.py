@@ -76,17 +76,22 @@ def parse_lines(lns):
             if lines[i][0] == 'else':
                 u = ast[-1]
                 u.append(lines[i][1:])
-                lines[i] = u
-                #ast = ast + (lines[1:]) 
-            if lines[i][0] == 'elseif':
+                #lines[i] = u
+            elif lines[i][0] == 'elseif':
                 u = ast[-1]
                 u.append(['if'] + lines[i][1:])
-                lines[i] = u
-                #ast.append(lines[i])
+                #lines[i] = u
+            
+            else:
+                print;print
+                print "LINES I AND AST:"
+                print lines[i];print;print
+                print ast
+                print;print
+                ast.append(lines[i])
                 
-
-            ast.append(lines[i])
             i += statements_counter
+
             
         elif lines[i][0]in ['end']:
             i += 1
