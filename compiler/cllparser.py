@@ -83,6 +83,7 @@ def parse_lines(lns):
                 u.append(['if'] + lines[i][1:])
                 lines[i] = u
                 #ast.append(lines[i])
+                
 
             ast.append(lines[i])
             i += statements_counter
