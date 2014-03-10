@@ -13,9 +13,6 @@ def parse_block(block):
     while i < len(block):
             
         if block[i][0] in ['if', 'else', 'elseif', 'while']:
-            print "BLOCK I 0 1st"
-            print block[i][0]
-            print
             block_concat = 'append'
             blocks_opened += 1
             nxt_block  = parse_block(block[i+1:])
@@ -76,18 +73,11 @@ def parse_lines(lns):
             if lines[i][0] == 'else':
                 u = ast[-1]
                 u.append(lines[i][1:])
-                #lines[i] = u
             elif lines[i][0] == 'elseif':
                 u = ast[-1]
                 u.append(['if'] + lines[i][1:])
-                #lines[i] = u
             
             else:
-                print;print
-                print "LINES I AND AST:"
-                print lines[i];print;print
-                print ast
-                print;print
                 ast.append(lines[i])
                 
             i += statements_counter
