@@ -72,7 +72,7 @@ def compile_left_expr(expr,varhash):
         return compile_expr(expr[1],varhash)
     elif typ == 'access':
         if get_left_expr_type(expr[1]) == 'storage':
-            return compile_left_expr(expr[1],varhash) + 'SLOAD' + compile_expr(expr[2],varhash)
+            return compile_left_expr(expr[1],varhash) + ['SLOAD'] + compile_expr(expr[2],varhash)
         else:
             return compile_left_expr(expr[1],varhash) + compile_expr(expr[2],varhash) + ['ADD']
     else:
@@ -80,6 +80,9 @@ def compile_left_expr(expr,varhash):
 
 # Right-hand-side expressions (ie. the normal kind)
 def compile_expr(expr,varhash):
+    print "EXPRESSION VARHASH"
+    print expr, varhash
+    print
     if isinstance(expr,str):
         if re.match('^[0-9\-]*$',expr):
             return ['PUSH',int(expr)]
@@ -91,8 +94,13 @@ def compile_expr(expr,varhash):
             varhash[expr] = len(varhash)
             return ['PUSH',varhash[expr],'MLOAD']
     elif expr[0] in optable:
+        print "i m here!!!!!"
         if len(expr) != 3:
             raise Exception("Wrong number of arguments: "+str(expr)) 
+        elif expr[0] == 'not':
+            print "i m here, too !!!!!"
+            f = compile_expr(expr[1],varhash)
+            return f + ['NOT']
         f = compile_expr(expr[1],varhash)
         g = compile_expr(expr[2],varhash)
         return f + g + [optable[expr[0]]]
@@ -139,11 +147,21 @@ def compile_stmt(stmt,varhash={},lc=[0]):
         if h: return f + [ 'NOT', ref, 'JMPI' ] + g + [ ref, 'JMP' ] + h + [ label ]
         else: return f + [ 'NOT', ref, 'JMPI' ] + g + [ label ]
     elif stmt[0] == 'while':
+        print "WHILE PARAMETER LIST"
         f = compile_expr(stmt[1],varhash)
         g = compile_stmt(stmt[2],varhash,lc)
         beglab, begref = 'LABEL_'+str(lc[0]), 'REF_'+str(lc[0])
         endlab, endref = 'LABEL_'+str(lc[0]+1), 'REF_'+str(lc[0]+1)
         lc[0] += 2
+        print f , g, beglab, begref, endlab, endref
+        print; print
+        return [ beglab ] + f + [ 'NOT', endref, 'JMPI' ] + g + [ begref, 'JMP', endlab ]
+    elif stmt[0] == 'until':
+        f = compile_expr(stmt[1],varhash)
+        g = compile_stmt(stmt[2],varhash,lc)
+        endlab, endgref = 'LABEL_'+str(lc[0]), 'REF_'+str(lc[0])
+        beginlab, begref = 'LABEL_'+str(lc[0]-1), 'REF_'+str(lc[0]-1)
+        lc[0] -= 2
         return [ beglab ] + f + [ 'NOT', endref, 'JMPI' ] + g + [ begref, 'JMP', endlab ]
     elif stmt[0] == 'set':
         lexp = compile_left_expr(stmt[1],varhash)
@@ -177,6 +195,9 @@ def compile_stmt(stmt,varhash={},lc=[0]):
 
 # Dereference labels
 def assemble(c):
+    print "ASSEMPLE (C)"
+    print c
+    print; print
     iq = [x for x in c]
     mq = []
     labelmap = {}
